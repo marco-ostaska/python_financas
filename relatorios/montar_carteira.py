@@ -2,25 +2,68 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import yfinance as yf
+from prettytable import PrettyTable
+from datetime import datetime, timedelta
 
 # Definindo os tickers
 tickers = ["BCRI11", "BDIF11", "BTAL11", "BTRA11", "FGAA11", "GALG11", "HGRU11", "HSAF11", "HSLG11", "HSML11", "IFRA11",
            "KNCA11", "KNCR11", "KNRI11", "MAXR11", "PATL11", "RURA11", "RZAG11", "VGIA11", "VISC11", "XPCA11", "XPID11",
-           "XPML11", "XPIN11", "MGLU3"]
+           "XPML11", "XPIN11"]
+
 tickers = [t + ".SA" for t in tickers]
 
+POUPANCA=0.6248
+SELIC=12.75
+ANO_DIAS_UTEIS=250
 
-def preco_teto_graham(ticker):
+
+def estimativa_retorno_anual(ticker):
+    hoje = datetime.today().date()
+    inicio_ano = datetime(hoje.year, 1, 1).date()
+    data = yf.download(ticker, start=inicio_ano, end=hoje, progress=False)['Adj Close'].dropna()
+    if not data.empty:
+        preco_inicial = data.iloc[0]
+        preco_final = data.iloc[-1]
+        # Calcular o número de dias de negociação até agora no ano
+        dias_negociacao = len(data)
+        # Calcular a taxa de retorno diária média até agora no ano
+        taxa_retorno_diaria_media = ((preco_final / preco_inicial) ** (1/dias_negociacao)) - 1
+        # Assumir que a taxa de retorno diária média continuará pelo resto do ano
+        # Calcular o número total de dias de negociação em um ano (aproximadamente 252 dias)
+        total_dias_negociacao = 252
+        # Calcular o retorno anual estimado
+        retorno_anual_estimado = ((1 + taxa_retorno_diaria_media) ** total_dias_negociacao) - 1
+        return retorno_anual_estimado * 100  # converter para porcentagem
+    else:
+        print(f"Dados históricos não disponíveis para {ticker}")
+        return None
+    
+def retorno_ano(ticker):
+    hoje = datetime.today().date()
+    inicio_ano = datetime(hoje.year, 1, 1).date()
+    data = yf.download(ticker, start=inicio_ano, end=hoje, progress=False)['Adj Close'].dropna()
+    if not data.empty:
+        preco_inicial = data.iloc[0]
+        preco_final = data.iloc[-1]
+        retorno_percentual = ((preco_final - preco_inicial) / preco_inicial) * 100
+        return retorno_percentual
+    else:
+        print(f"Dados históricos não disponíveis para {ticker}")
+        return None
+    
+def preco_teto_adaptado(ticker, taxa_retorno_esperada):
     stock_info = yf.Ticker(ticker)
-    eps = stock_info.info['trailingEps']  # Lucro por ação dos últimos 12 meses
+    # Verificar se 'Open' está presente no dicionário info
+    if 'open' in stock_info.info and stock_info.info['open'] is not None:
+        preco_abertura = stock_info.info['open']
+    else:
+        print(f"'open' não disponível para {ticker}")
+        return None  # ou retornar algum outro valor indicativo
 
-    # Aqui, precisamos de uma estimativa da taxa de crescimento dos lucros (g).
-    # Neste exemplo, estou usando um valor fictício de 0.05 (ou 5%).
-    # Você deve substituir isso por um cálculo ou valor mais preciso.
-    g = 0.05
+    # Calcular o Preço Teto adaptado
+    preco_teto = preco_abertura * (1 + taxa_retorno_esperada)
+    return preco_teto
 
-    V = eps * (8.5 + 2 * (g * 100))
-    return V
 
 
 # Função para calcular o retorno esperado através do CAPM
@@ -31,11 +74,11 @@ def retorno_esperado_capm(ticker, mercado_ticker="DIVO11.SA"):
     data = yf.download([ticker, mercado_ticker],
                        start="2018-01-01", progress=False)['Adj Close'].dropna()
     log_returns = np.log(data / data.shift(1))
-    ativo_livre_risco = 0.005 * 12
-    premio_risco = 0.1275
-    cov_mercado = log_returns.cov() * 250
+    ativo_livre_risco = (POUPANCA/100) * 12 # Poupança
+    premio_risco = SELIC/100 # Selic
+    cov_mercado = log_returns.cov() * ANO_DIAS_UTEIS
     cov_com_mercado = cov_mercado.iloc[0, 1]
-    var_mercado = log_returns[mercado_ticker].var() * 250
+    var_mercado = log_returns[mercado_ticker].var() * ANO_DIAS_UTEIS
     beta = cov_com_mercado / var_mercado
     capm = ativo_livre_risco + beta * premio_risco
     return capm
@@ -46,7 +89,7 @@ def retorno_esperado_capm(ticker, mercado_ticker="DIVO11.SA"):
 def risco_ativo(ticker):
     data = yf.download(ticker, start="2018-01-01", progress=False)['Adj Close'].dropna()
     log_returns = np.log(data / data.shift(1))
-    volatilidade = log_returns.std() * np.sqrt(250)
+    volatilidade = log_returns.std() * np.sqrt(ANO_DIAS_UTEIS)
     return volatilidade
 
 
@@ -54,21 +97,34 @@ def risco_ativo(ticker):
 for ticker in tickers:
     capm = retorno_esperado_capm(ticker)
     risco = risco_ativo(ticker)
-    print(f"Retorno Esperado para {ticker}: {capm*100:.2f}%")
-    print(f"Risco (Volatilidade) de {ticker}: {risco*100:.2f}%")
-    ticker_price_teto = preco_teto_graham(ticker)
-    print(f"Preço Teto (Graham) para {ticker}: R$ {ticker_price_teto:.2f}")
+    ticker_price_teto = preco_teto_adaptado(ticker, capm)
+    retorno_percentual = retorno_ano(ticker)
+    retorno_anual_estimado = estimativa_retorno_anual(ticker)
+    
+    table = PrettyTable()
+    table.title = ticker
+    table.field_names = ["Descrição", "Valor"]
+    table.align["Descrição"] = "l"  # Alinhamento à esquerda
+    table.align["Valor"] = "r"  # Alinhamento à direita
+    table.add_row(["Retorno Esperado", f"{capm*100:.2f}%"])
+    table.add_row(["Risco (Volatilidade)", f"{risco*100:.2f}%"])
+    table.add_row(["Preço Teto", f"R$ {ticker_price_teto:.2f}" if ticker_price_teto is not None else "Não disponível"])
+    table.add_row(["Retorno no Ano", f"{retorno_percentual:.2f}%" if retorno_percentual is not None else "Não disponível"])
+    table.add_row(["Retorno Anual Estimado", f"{retorno_anual_estimado:.2f}%" if retorno_anual_estimado is not None else "Não disponível"])
+    print(table)
+    print()  # Linha em branco entre as tabelas
 
-    print("-----------------------------------------------------")
+
+
 
 # Baixando os dados
-ativos = yf.download(tickers, start="2018-01-01")['Adj Close'].dropna()
+ativos = yf.download(tickers, start="2018-01-01", progress=False)['Adj Close'].dropna()
 retorno_diario = ativos.pct_change()
-retorno_anual = retorno_diario.mean() * 250
+retorno_anual = retorno_diario.mean() * ANO_DIAS_UTEIS
 
 # Cálculo da covariância diária e anual
 cov_diaria = retorno_diario.cov()
-cov_anual = cov_diaria * 250
+cov_anual = cov_diaria * ANO_DIAS_UTEIS
 
 # Simulação de carteiras
 retorno_carteira = []
@@ -109,17 +165,35 @@ carteira_min_variancia = df.loc[df['Volatilidade'] == menor_volatilidade]
 
 
 def print_portfolio(df, title):
-    print(title)
-    print(f"Retorno: {df['Retorno'].iloc[0]*100:.2f}%")
-    print(f"Volatilidade: {df['Volatilidade'].iloc[0]*100:.2f}%")
-    print(f"Sharpe Ratio: {df['Sharpe Ratio'].iloc[0]:.2f}")
-    sorted_weights = df.drop(columns=[
-                             'Retorno', 'Volatilidade', 'Sharpe Ratio']).iloc[0].sort_values(ascending=False) * 100
+    table = PrettyTable()
+    table.title = title
+    table.field_names = ["Descrição", "Valor"]
+    table.align["Descrição"] = "l"  # Alinhamento à esquerda
+    table.align["Valor"] = "r"  # Alinhamento à direita
+    table.add_row(["Retorno", f"{df['Retorno'].iloc[0]*100:.2f}%"])
+    table.add_row(["Volatilidade", f"{df['Volatilidade'].iloc[0]*100:.2f}%"])
+    table.add_row(["Sharpe Ratio", f"{df['Sharpe Ratio'].iloc[0]:.2f}"])
+    print(table)
+
+    table = PrettyTable()
+    table.title = "Alocaçao"
+    table.field_names = ["Ativo", "Porcentagem"]
+    
+    sorted_weights = df.drop(columns=['Retorno', 'Volatilidade', 'Sharpe Ratio']).iloc[0].sort_values(ascending=False) * 100
     for index, value in sorted_weights.items():
-        print(f"{index.replace(' Peso','')}: {value:.2f}%")
+        table.add_row([index.replace(' Peso', ' Alocação'), f"{value:.2f}%"])
+    
+    print(table)
+    print()
     print()
 
 
+print()
+print()
+print("Carteiras recomendadas")
+print("-----------------------------------------------------")
+print()
+
 print_portfolio(carteira_min_variancia,
-                "Essa é a carteira de Mínima Variância:")
-print_portfolio(carteira_sharpe, "Essa é a carteira com maior Sharpe Ratio:")
+                "Carteira como menor risto:")
+print_portfolio(carteira_sharpe, "Carteira como melhor risco/retorno")
