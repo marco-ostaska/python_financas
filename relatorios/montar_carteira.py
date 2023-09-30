@@ -6,10 +6,12 @@ from prettytable import PrettyTable
 from datetime import datetime, timedelta
 
 # Definindo os tickers
-tickers = ["BCRI11", "BDIF11", "BTAL11", "BTRA11", "FGAA11", "GALG11", "HGRU11", "HSAF11", "HSLG11", "HSML11", "IFRA11",
-           "KNCA11", "KNCR11", "KNRI11", "MAXR11", "PATL11", "RURA11", "RZAG11", "VGIA11", "VISC11", "XPCA11", "XPID11",
-           "XPML11", "XPIN11"]
+# tickers = ["BCRI11", "BDIF11", "BTAL11", "BTRA11", "FGAA11", "GALG11", "HGRU11", "HSAF11", "HSLG11", "HSML11", "IFRA11",
+#            "KNCA11", "KNCR11", "KNRI11", "MAXR11", "PATL11", "RURA11", "RZAG11", "VGIA11", "VISC11", "XPCA11", "XPID11",
+#            "XPML11", "XPIN11"]
 
+
+tickers = ["VALE3", "TAEE11", "KLBN11", "MGLU3"]
 tickers = [t + ".SA" for t in tickers]
 
 POUPANCA=0.6248
