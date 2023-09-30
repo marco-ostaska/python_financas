@@ -11,8 +11,11 @@ from datetime import datetime, timedelta
 #            "XPML11", "XPIN11"]
 
 
-tickers = ["VALE3", "TAEE11", "KLBN11", "MGLU3"]
+tickers = input("Entre os tickers separados por virgula: ")
+tickers = [t.upper().strip() for t in tickers.split(",")]
+print(tickers)
 tickers = [t + ".SA" for t in tickers]
+DATA_INICIO='2018-01-01'
 
 POUPANCA=0.6248
 SELIC=12.75
@@ -74,7 +77,7 @@ def preco_teto_adaptado(ticker, taxa_retorno_esperada):
 
 def retorno_esperado_capm(ticker, mercado_ticker="DIVO11.SA"):
     data = yf.download([ticker, mercado_ticker],
-                       start="2018-01-01", progress=False)['Adj Close'].dropna()
+                       start=DATA_INICIO, progress=False)['Adj Close'].dropna()
     log_returns = np.log(data / data.shift(1))
     ativo_livre_risco = (POUPANCA/100) * 12 # Poupança
     premio_risco = SELIC/100 # Selic
