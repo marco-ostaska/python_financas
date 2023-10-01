@@ -118,7 +118,7 @@ for ticker in tickers:
     table.add_row(["Preço Teto", f"R$ {ticker_price_teto:.2f}" if ticker_price_teto is not None else "Não disponível"])
     table.add_row(["Retorno no Ano", f"{retorno_percentual:.2f}%" if retorno_percentual is not None else "Não disponível"])
     table.add_row(["Retorno Anual Estimado", f"{retorno_anual_estimado:.2f}%" if retorno_anual_estimado is not None else "Não disponível"])
-    table.add_row(["Situação", f"Retorno Anual dentro do esperado" if retorno_anual_estimado >= capm else "Retorno Anual abaixo do esperado"])
+    table.add_row(["Performance", f"BOM" if retorno_anual_estimado >= capm else "RUIM"])
  
     print(table)
     print()  # Linha em branco entre as tabelas
@@ -174,28 +174,44 @@ carteira_min_variancia = df.loc[df['Volatilidade'] == menor_volatilidade]
 # Função para imprimir os detalhes das carteiras
 
 
+def calcular_retorno_carteira_recomendada(df):
+    retornos = []
+    for ticker in tickers:
+        retorno = retorno_ano(ticker)
+        peso = df[ticker + " Peso"].iloc[0]
+        retornos.append(retorno * peso)
+    return sum(retornos)
+
 def print_portfolio(df, title):
+    retorno_atual = calcular_retorno_carteira_recomendada(df)
+    
+    carteira_status = "Sharpe Ratio bom" if df['Sharpe Ratio'].iloc[0] > 0.5 else "Sharpe Ratio ruim"
     table = PrettyTable()
     table.title = title
     table.field_names = ["Descrição", "Valor"]
     table.align["Descrição"] = "l"  # Alinhamento à esquerda
     table.align["Valor"] = "r"  # Alinhamento à direita
-    table.add_row(["Retorno", f"{df['Retorno'].iloc[0]*100:.2f}%"])
-    table.add_row(["Volatilidade", f"{df['Volatilidade'].iloc[0]*100:.2f}%"])
+    table.add_row(["Retorno Esperado", f"{df['Retorno'].iloc[0]*100:.2f}%"])
+    table.add_row(["Retorno Atual", f"{retorno_atual:.2f}%"])
+    table.add_row(["Status", f"{carteira_status}"])
+    table.add_row(["Volatilidade (Risco )", f"{df['Volatilidade'].iloc[0]*100:.2f}%"])
     table.add_row(["Sharpe Ratio", f"{df['Sharpe Ratio'].iloc[0]:.2f}"])
+    
+    
     print(table)
 
     table = PrettyTable()
     table.title = "Alocaçao"
-    table.field_names = ["Ativo", "Porcentagem"]
+    table.field_names = ["Ativo", "Alocação"]
     
     sorted_weights = df.drop(columns=['Retorno', 'Volatilidade', 'Sharpe Ratio']).iloc[0].sort_values(ascending=False) * 100
     for index, value in sorted_weights.items():
-        table.add_row([index.replace(' Peso', ' Alocação'), f"{value:.2f}%"])
+        table.add_row([index.replace(' Peso', ''), f"{value:.2f}%"])
     
     print(table)
     print()
     print()
+
 
 
 print()
@@ -204,6 +220,6 @@ print("Carteiras recomendadas")
 print("-----------------------------------------------------")
 print()
 
-print_portfolio(carteira_min_variancia,
-                "Carteira como menor risto:")
-print_portfolio(carteira_sharpe, "Carteira como melhor risco/retorno")
+
+print_portfolio(carteira_min_variancia, "Carteira com menor risco:")
+print_portfolio(carteira_sharpe, "Carteira com melhor risco/retorno")

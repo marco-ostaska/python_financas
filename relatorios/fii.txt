@@ -1,0 +1,42 @@
+
++--------------------------------------------------+
+|        Carteira com melhor risco/retorno         |
++-----------------------+--------------------------+
+| Descrição             |                    Valor |
++-----------------------+--------------------------+
+| Retorno Esperado      |                   26.16% |
+| Retorno Atual         |                   16.18% |
+| Status                | Carteira com bons ativos |
+| Volatilidade (Risco ) |                    4.34% |
+| Sharpe Ratio          |                     6.03 |
++-----------------------+--------------------------+
++----------------------------------+
+|             Alocaçao             |
++--------------------+-------------+
+|       Ativo        | Porcentagem |
++--------------------+-------------+
+| XPID11.SA Alocação |    9.01%    |
+| KNCR11.SA Alocação |    8.44%    |
+| HGRU11.SA Alocação |    7.90%    |
+| HSML11.SA Alocação |    7.65%    |
+| KNRI11.SA Alocação |    7.60%    |
+| RZAG11.SA Alocação |    7.16%    |
+| IFRA11.SA Alocação |    6.66%    |
+| XPML11.SA Alocação |    6.63%    |
+| VISC11.SA Alocação |    5.54%    |
+| BDIF11.SA Alocação |    5.37%    |
+| XPIN11.SA Alocação |    5.12%    |
+| KNCA11.SA Alocação |    3.38%    |
+| MAXR11.SA Alocação |    3.03%    |
+| VGIA11.SA Alocação |    2.90%    |
+| HSAF11.SA Alocação |    2.75%    |
+| XPCA11.SA Alocação |    2.14%    |
+| RURA11.SA Alocação |    1.85%    |
+| FGAA11.SA Alocação |    1.58%    |
+| PATL11.SA Alocação |    1.42%    |
+| HSLG11.SA Alocação |    1.33%    |
+| BCRI11.SA Alocação |    1.07%    |
+| GALG11.SA Alocação |    0.69%    |
+| BTAL11.SA Alocação |    0.48%    |
+| BTRA11.SA Alocação |    0.29%    |
++--------------------+-------------+
