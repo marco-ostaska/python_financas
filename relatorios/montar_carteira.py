@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import yfinance as yf
 from prettytable import PrettyTable
 from datetime import datetime, timedelta
+from tqdm import tqdm
 
 # Definindo os tickers
 # tickers = ["BCRI11", "BDIF11", "BTAL11", "BTRA11", "FGAA11", "GALG11", "HGRU11", "HSAF11", "HSLG11", "HSML11", "IFRA11",
@@ -19,7 +20,7 @@ DATA_INICIO='2018-01-01'
 
 POUPANCA=0.6248
 SELIC=12.75
-ANO_DIAS_UTEIS=250
+ANO_DIAS_UTEIS=252
 
 
 def estimativa_retorno_anual(ticker):
@@ -35,7 +36,7 @@ def estimativa_retorno_anual(ticker):
         taxa_retorno_diaria_media = ((preco_final / preco_inicial) ** (1/dias_negociacao)) - 1
         # Assumir que a taxa de retorno diária média continuará pelo resto do ano
         # Calcular o número total de dias de negociação em um ano (aproximadamente 252 dias)
-        total_dias_negociacao = 252
+        total_dias_negociacao = ANO_DIAS_UTEIS
         # Calcular o retorno anual estimado
         retorno_anual_estimado = ((1 + taxa_retorno_diaria_media) ** total_dias_negociacao) - 1
         return retorno_anual_estimado * 100  # converter para porcentagem
@@ -66,7 +67,7 @@ def preco_teto_adaptado(ticker, taxa_retorno_esperada):
         return None  # ou retornar algum outro valor indicativo
 
     # Calcular o Preço Teto adaptado
-    preco_teto = preco_abertura * (1 + taxa_retorno_esperada)
+    preco_teto = preco_abertura * (0.92 + taxa_retorno_esperada)
     return preco_teto
 
 
@@ -105,17 +106,20 @@ for ticker in tickers:
     ticker_price_teto = preco_teto_adaptado(ticker, capm)
     retorno_percentual = retorno_ano(ticker)
     retorno_anual_estimado = estimativa_retorno_anual(ticker)
+
     
     table = PrettyTable()
     table.title = ticker
     table.field_names = ["Descrição", "Valor"]
     table.align["Descrição"] = "l"  # Alinhamento à esquerda
     table.align["Valor"] = "r"  # Alinhamento à direita
-    table.add_row(["Retorno Esperado", f"{capm*100:.2f}%"])
+    table.add_row(["Retorno Anual Esperado para valer correr o risco ", f"{capm*100:.2f}%"])
     table.add_row(["Risco (Volatilidade)", f"{risco*100:.2f}%"])
     table.add_row(["Preço Teto", f"R$ {ticker_price_teto:.2f}" if ticker_price_teto is not None else "Não disponível"])
     table.add_row(["Retorno no Ano", f"{retorno_percentual:.2f}%" if retorno_percentual is not None else "Não disponível"])
     table.add_row(["Retorno Anual Estimado", f"{retorno_anual_estimado:.2f}%" if retorno_anual_estimado is not None else "Não disponível"])
+    table.add_row(["Situação", f"Retorno Anual dentro do esperado" if retorno_anual_estimado >= capm else "Retorno Anual abaixo do esperado"])
+ 
     print(table)
     print()  # Linha em branco entre as tabelas
 
@@ -140,7 +144,8 @@ numero_acoes = len(tickers)
 numero_carteiras = 100000
 np.random.seed(101)
 
-for cada_carteira in range(numero_carteiras):
+print("Verificando melhor distribuição de carteiras")
+for cada_carteira in tqdm(range(numero_carteiras)):
     peso = np.random.random(numero_acoes)
     peso /= np.sum(peso)
     retorno = np.dot(peso, retorno_anual)
