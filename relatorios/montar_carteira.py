@@ -59,15 +59,16 @@ def retorno_ano(ticker):
     
 def preco_teto_adaptado(ticker, taxa_retorno_esperada):
     stock_info = yf.Ticker(ticker)
-    # Verificar se 'Open' está presente no dicionário info
-    if 'open' in stock_info.info and stock_info.info['open'] is not None:
-        preco_abertura = stock_info.info['open']
+    # Verificar se 'previousClose' está presente no dicionário info
+    if 'previousClose' in stock_info.info and stock_info.info['previousClose'] is not None:
+        preco_fechamento = stock_info.info['previousClose']
     else:
-        print(f"'open' não disponível para {ticker}")
-        return None  # ou retornar algum outro valor indicativo
+        return None
+    
+    margem_seguranca = 0.05
+    taxa = ((100 - (100/(SELIC*0.85))) /100) - margem_seguranca
+    preco_teto = preco_fechamento * (taxa + taxa_retorno_esperada)
 
-    # Calcular o Preço Teto adaptado
-    preco_teto = preco_abertura * (0.92 + taxa_retorno_esperada)
     return preco_teto
 
 
