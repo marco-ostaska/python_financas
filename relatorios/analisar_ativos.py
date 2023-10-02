@@ -61,7 +61,7 @@ def estimativa_retorno_anual(ticker):
     else:
         print(f"Dados históricos não disponíveis para {ticker}")
         return None
-    
+
 def retorno_ano(ticker):
     hoje = datetime.today().date()
     inicio_ano = datetime(hoje.year, 1, 1).date()
@@ -74,7 +74,7 @@ def retorno_ano(ticker):
     else:
         print(f"Dados históricos não disponíveis para {ticker}")
         return None
-    
+
 def ticker_info(ticker):
     return yf.Ticker(ticker)
 
@@ -96,9 +96,9 @@ def get_price(ticker_info):
 def get_last_dividend(ticker_info):
     if 'lastDividendValue' in ticker_info.info and ticker_info.info['lastDividendValue'] is not None:
         return ticker_info.info['lastDividendValue']
-    return None    
+    return None
 
-    
+
 def preco_teto_adaptado(ticker_info, taxa_retorno_esperada):
     # Verificar se 'previousClose' está presente no dicionário info
     if 'previousClose' in ticker_info.info and ticker_info.info['previousClose'] is not None:
@@ -108,9 +108,9 @@ def preco_teto_adaptado(ticker_info, taxa_retorno_esperada):
         preco_teto = preco_fechamento * (taxa + taxa_retorno_esperada)
 
         return preco_teto
-    
+
     return None
-    
+
 
 
 
@@ -158,9 +158,9 @@ def output(tickers):
         table.add_row(["Risco (Volatilidade)", f"{risco*100:.2f}%"])
         table.add_row(["Preço Justo", f"R$ {ticker_price_teto:.2f}" if ticker_price_teto is not None else "N/A"])
         table.add_row(["Preço Atual", f"R$ {get_price(ticker_information):.2f}" if get_price(ticker_information) is not None else "N/A"])
-        table.add_row(["Compra", f"R$ {get_bid(ticker_information):.2f}" if get_bid(ticker_information) is not None else "N/A"])
-        table.add_row(["Venda", f"R$ {get_ask(ticker_information):.2f}" if get_ask(ticker_information) is not None else "N/A"])
-        table.add_row(["Preço Sugerido", f"R$ {get_bid(ticker_information)*0.995:.2f}" if get_bid(ticker_information) is not None else "N/A"])
+        table.add_row(["Venda", f"R$ {get_bid(ticker_information):.2f}" if get_bid(ticker_information) is not None else "N/A"])
+        table.add_row(["Compra", f"R$ {get_ask(ticker_information):.2f}" if get_ask(ticker_information) is not None else "N/A"])
+        table.add_row(["Preço Sugerido", f"R$ {get_ask(ticker_information)*0.995:.2f}" if get_ask(ticker_information) is not None else "N/A"])
         table.add_row(["Ultimo Dividendo", f"R$ {get_last_dividend(ticker_information):.2f}" if get_last_dividend(ticker_information) is not None else "N/A"])
         print(table)
         print()  # Linha em branco entre as tabelas
