@@ -15,6 +15,7 @@ from tqdm import tqdm
 tickers = input("Entre os tickers separados por virgula: ")
 tickers = [t.upper().strip() for t in tickers.split(",")]
 print(tickers)
+tickers=(sorted(tickers))
 tickers = [t + ".SA" for t in tickers]
 DATA_INICIO='2018-01-01'
 
@@ -74,9 +75,6 @@ def preco_teto_adaptado(ticker, taxa_retorno_esperada):
 
 
 # Função para calcular o retorno esperado através do CAPM
-
-
-
 def retorno_esperado_capm(ticker, mercado_ticker="DIVO11.SA"):
     data = yf.download([ticker, mercado_ticker],
                        start=DATA_INICIO, progress=False)['Adj Close'].dropna()
@@ -91,8 +89,6 @@ def retorno_esperado_capm(ticker, mercado_ticker="DIVO11.SA"):
     return capm
 
 # Função para calcular a volatilidade (risco) de cada ativo
-
-
 def risco_ativo(ticker):
     data = yf.download(ticker, start="2018-01-01", progress=False)['Adj Close'].dropna()
     log_returns = np.log(data / data.shift(1))
@@ -101,33 +97,33 @@ def risco_ativo(ticker):
 
 
 # Usando as funções para calcular os valores desejados para todos os ativos
-for ticker in tickers:
-    capm = retorno_esperado_capm(ticker)
-    risco = risco_ativo(ticker)
-    ticker_price_teto = preco_teto_adaptado(ticker, capm)
-    retorno_percentual = retorno_ano(ticker)
-    retorno_anual_estimado = estimativa_retorno_anual(ticker)
+# for ticker in tickers:
+#     capm = retorno_esperado_capm(ticker)
+#     risco = risco_ativo(ticker)
+#     ticker_price_teto = preco_teto_adaptado(ticker, capm)
+#     retorno_percentual = retorno_ano(ticker)
+#     retorno_anual_estimado = estimativa_retorno_anual(ticker)
 
     
-    table = PrettyTable()
-    table.title = ticker
-    table.field_names = ["Descrição", "Valor"]
-    table.align["Descrição"] = "l"  # Alinhamento à esquerda
-    table.align["Valor"] = "r"  # Alinhamento à direita
-    table.add_row(["Retorno Anual Esperado para valer correr o risco ", f"{capm*100:.2f}%"])
-    table.add_row(["Risco (Volatilidade)", f"{risco*100:.2f}%"])
-    table.add_row(["Preço Teto", f"R$ {ticker_price_teto:.2f}" if ticker_price_teto is not None else "Não disponível"])
-    table.add_row(["Retorno no Ano", f"{retorno_percentual:.2f}%" if retorno_percentual is not None else "Não disponível"])
-    table.add_row(["Retorno Anual Estimado", f"{retorno_anual_estimado:.2f}%" if retorno_anual_estimado is not None else "Não disponível"])
-    table.add_row(["Performance", f"BOM" if retorno_anual_estimado >= capm else "RUIM"])
+#     table = PrettyTable()
+#     table.title = ticker
+#     table.field_names = ["Descrição", "Valor"]
+#     table.align["Descrição"] = "l"  # Alinhamento à esquerda
+#     table.align["Valor"] = "r"  # Alinhamento à direita
+#     table.add_row(["Retorno Anual Esperado para valer correr o risco ", f"{capm*100:.2f}%"])
+#     table.add_row(["Risco (Volatilidade)", f"{risco*100:.2f}%"])
+#     table.add_row(["Preço Teto", f"R$ {ticker_price_teto:.2f}" if ticker_price_teto is not None else "Não disponível"])
+#     table.add_row(["Retorno no Ano", f"{retorno_percentual:.2f}%" if retorno_percentual is not None else "Não disponível"])
+#     table.add_row(["Retorno Anual Estimado", f"{retorno_anual_estimado:.2f}%" if retorno_anual_estimado is not None else "Não disponível"])
+#     table.add_row(["Performance", f"BOM" if retorno_anual_estimado >= capm else "RUIM"])
  
-    print(table)
-    print()  # Linha em branco entre as tabelas
+#     print(table)
+#     print()  # Linha em branco entre as tabelas
 
 
 
 
-# Baixando os dados
+# Baixando os dados carteira
 ativos = yf.download(tickers, start="2018-01-01", progress=False)['Adj Close'].dropna()
 retorno_diario = ativos.pct_change()
 retorno_anual = retorno_diario.mean() * ANO_DIAS_UTEIS
@@ -142,7 +138,7 @@ peso_acoes = []
 volatilidade_carteira = []
 sharpe_ratio = []
 numero_acoes = len(tickers)
-numero_carteiras = 100000
+numero_carteiras = 500000
 np.random.seed(101)
 
 print("Verificando melhor distribuição de carteiras")
@@ -173,8 +169,6 @@ carteira_sharpe = df.loc[df['Sharpe Ratio'] == maior_sharpe]
 carteira_min_variancia = df.loc[df['Volatilidade'] == menor_volatilidade]
 
 # Função para imprimir os detalhes das carteiras
-
-
 def calcular_retorno_carteira_recomendada(df):
     retornos = []
     for ticker in tickers:
@@ -210,26 +204,26 @@ def print_portfolio(df, title):
     for ticker, weight in zip(tickers, weights):
         table.add_row([ticker.replace('.SA', ''), f"{weight:.2f}%"])
 
-    # fazendo isso pra conseguir ordenar as tabelas, sou meio burro entao depois penso em algo melhor
-    # Pegando os nomes das colunas
-    columns = table.field_names
+    # # fazendo isso pra conseguir ordenar as tabelas, sou meio burro entao depois penso em algo melhor
+    # # Pegando os nomes das colunas
+    # columns = table.field_names
 
-    # Pegando os valores
-    values = [list(row) for row in table._rows]
+    # # Pegando os valores
+    # values = [list(row) for row in table._rows]
 
-    # Criando o dataframe
-    dfaux = pd.DataFrame(values, columns=columns)
+    # # Criando o dataframe
+    # dfaux = pd.DataFrame(values, columns=columns)
 
-    # Convertendo a coluna Alocação para float
-    dfaux['Alocação'] = dfaux['Alocação'].str.rstrip('%').astype('float') / 100.0
-    dfaux = dfaux.sort_values(by="Alocação", ascending=False)
+    # # Convertendo a coluna Alocação para float
+    # dfaux['Alocação'] = dfaux['Alocação'].str.rstrip('%').astype('float') / 100.0
+    # dfaux = dfaux.sort_values(by="Alocação", ascending=False)
 
-    # Limpar as linhas do objeto table para inserir os valores atualizados de dfaux
-    table.clear_rows()
+    # # Limpar as linhas do objeto table para inserir os valores atualizados de dfaux
+    # table.clear_rows()
 
-    # Adicionar os valores de dfaux à tabela
-    for index, row in dfaux.iterrows():
-        table.add_row([row['Ativo'], f"{row['Alocação']*100:.2f}%"])
+    # # Adicionar os valores de dfaux à tabela
+    # for index, row in dfaux.iterrows():
+    #     table.add_row([row['Ativo'], f"{row['Alocação']*100:.2f}%"])
     
     print(table)
     

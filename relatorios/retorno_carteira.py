@@ -112,12 +112,14 @@ def risco_ativo(ticker):
 
 
 # Usando as funções para calcular os valores desejados para todos os ativos
-for ticker in tqdm(tickers):
-    capm = retorno_esperado_capm(ticker)
-    risco = risco_ativo(ticker)
-    ticker_price_teto = preco_teto_adaptado(ticker, capm)
-    retorno_percentual = retorno_ano(ticker)
-    retorno_anual_estimado = estimativa_retorno_anual(ticker)
+# print()
+# print("Analisando Performance da carteira")
+# for ticker in tqdm(tickers):
+#     capm = retorno_esperado_capm(ticker)
+#     risco = risco_ativo(ticker)
+#     ticker_price_teto = preco_teto_adaptado(ticker, capm)
+#     retorno_percentual = retorno_ano(ticker)
+#     retorno_anual_estimado = estimativa_retorno_anual(ticker)
 
     
     # table = PrettyTable()
@@ -217,6 +219,7 @@ def print_portfolio(df, title):
     for ticker, weight in zip(tickers, weights):
         table.add_row([ticker.replace('.SA', ''), f"{weight:.2f}%"])
 
+    # fazendo isso pra conseguir ordenar as tabelas, sou meio burro entao depois penso em algo melhor
     # Pegando os nomes das colunas
     columns = table.field_names
 
@@ -245,13 +248,10 @@ def print_portfolio(df, title):
 
 print()
 print()
-print("Carteiras recomendadas")
-print("-----------------------------------------------------")
-print()
+
 
 
 
 
 carteira_df = pd.DataFrame(carteira)
-print_portfolio(carteira_df, "Carteira com menor risco:")
-#print_portfolio(carteira_sharpe, "Carteira com melhor risco/retorno")
+print_portfolio(carteira_df, "Perfomance da Carteira")
