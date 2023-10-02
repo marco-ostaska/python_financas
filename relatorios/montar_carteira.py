@@ -204,12 +204,35 @@ def print_portfolio(df, title):
     table = PrettyTable()
     table.title = "Alocaçao"
     table.field_names = ["Ativo", "Alocação"]
-    
-    sorted_weights = df.drop(columns=['Retorno', 'Volatilidade', 'Sharpe Ratio']).iloc[0].sort_values(ascending=False) * 100
-    for index, value in sorted_weights.items():
-        table.add_row([index.replace(' Peso', ''), f"{value:.2f}%"])
+
+    weights = df.drop(columns=['Retorno', 'Volatilidade', 'Sharpe Ratio']).iloc[0] * 100
+
+    for ticker, weight in zip(tickers, weights):
+        table.add_row([ticker.replace('.SA', ''), f"{weight:.2f}%"])
+
+    # fazendo isso pra conseguir ordenar as tabelas, sou meio burro entao depois penso em algo melhor
+    # Pegando os nomes das colunas
+    columns = table.field_names
+
+    # Pegando os valores
+    values = [list(row) for row in table._rows]
+
+    # Criando o dataframe
+    dfaux = pd.DataFrame(values, columns=columns)
+
+    # Convertendo a coluna Alocação para float
+    dfaux['Alocação'] = dfaux['Alocação'].str.rstrip('%').astype('float') / 100.0
+    dfaux = dfaux.sort_values(by="Alocação", ascending=False)
+
+    # Limpar as linhas do objeto table para inserir os valores atualizados de dfaux
+    table.clear_rows()
+
+    # Adicionar os valores de dfaux à tabela
+    for index, row in dfaux.iterrows():
+        table.add_row([row['Ativo'], f"{row['Alocação']*100:.2f}%"])
     
     print(table)
+    
     print()
     print()
 

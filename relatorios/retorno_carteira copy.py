@@ -6,33 +6,41 @@ from prettytable import PrettyTable
 from datetime import datetime, timedelta
 from tqdm import tqdm
 
+# Definindo os tickers
+# tickers = ["BCRI11", "BDIF11", "BTAL11", "BTRA11", "FGAA11", "GALG11", "HGRU11", "HSAF11", "HSLG11", "HSML11", "IFRA11",
+#            "KNCA11", "KNCR11", "KNRI11", "MAXR11", "PATL11", "RURA11", "RZAG11", "VGIA11", "VISC11", "XPCA11", "XPID11",
+#            "XPML11", "XPIN11"]
 
-# Constantes
+
+tickers = input("Entre os tickers separados por virgula: ")
+tickers = [t.upper().strip() for t in tickers.split(",")]
+
+
+# Solicitar os pesos dos ativos ao usuário
+pesos_str = input("Entre com os pesos dos ativos, separados por vírgula: ")
+peso = np.array([float(p.strip())/100 for p in pesos_str.split(",")])
+
+
+if len(peso) != len(tickers):
+    print("Numero de % não bate com o numero de tickers")
+    exit()
+
+# # Checar se a soma dos pesos é 1.0
+# if sum(peso) != 1.0:
+#     peso = peso / np.sum(peso)
+
+print(peso)
+
+
+
+print(tickers)
+tickers = [t + ".SA" for t in tickers]
 DATA_INICIO='2018-01-01'
+
 POUPANCA=0.6248
 SELIC=12.75
 ANO_DIAS_UTEIS=252
 
-
-def dados_usuario():
-    tickers = input("Entre os tickers separados por virgula: ")
-    tickers = [t.upper().strip() for t in tickers.split(",")]
-    tickers = [t + ".SA" for t in tickers]
-
-    # Solicitar os pesos dos ativos ao usuário
-    pesos_str = input("Entre com os pesos dos ativos, separados por vírgula: ")
-    alocacao = np.array([float(p.strip())/100 for p in pesos_str.split(",")])
-
-    if len(alocacao) != len(tickers):
-        print("Numero de % não bate com o numero de tickers")
-        exit()
-
-    print(tickers)
-    print(alocacao)
-
-    return tickers, alocacao
-
-tickers, peso = dados_usuario()
 
 def estimativa_retorno_anual(ticker):
     hoje = datetime.today().date()
@@ -211,31 +219,10 @@ def print_portfolio(df, title):
     table = PrettyTable()
     table.title = "Alocaçao"
     table.field_names = ["Ativo", "Alocação"]
-
-    weights = df.drop(columns=['Retorno', 'Volatilidade', 'Sharpe Ratio']).iloc[0] * 100
-
-    for ticker, weight in zip(tickers, weights):
-        table.add_row([ticker.replace('.SA', ''), f"{weight:.2f}%"])
-
-    # Pegando os nomes das colunas
-    columns = table.field_names
-
-    # Pegando os valores
-    values = [list(row) for row in table._rows]
-
-    # Criando o dataframe
-    dfaux = pd.DataFrame(values, columns=columns)
-
-    # Convertendo a coluna Alocação para float
-    dfaux['Alocação'] = dfaux['Alocação'].str.rstrip('%').astype('float') / 100.0
-    dfaux = dfaux.sort_values(by="Alocação", ascending=False)
-
-    # Limpar as linhas do objeto table para inserir os valores atualizados de dfaux
-    table.clear_rows()
-
-    # Adicionar os valores de dfaux à tabela
-    for index, row in dfaux.iterrows():
-        table.add_row([row['Ativo'], f"{row['Alocação']*100:.2f}%"])
+    
+    sorted_weights = df.drop(columns=['Retorno', 'Volatilidade', 'Sharpe Ratio']).iloc[0].sort_values(ascending=False) * 100
+    for index, value in sorted_weights.items():
+        table.add_row([index.replace(' Peso', ''), f"{value:.2f}%"])
     
     print(table)
     print()
