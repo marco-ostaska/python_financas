@@ -170,7 +170,7 @@ def output(tickers):
         table.add_row(["Risco (Volatilidade)", f"{risco*100:.2f}%"])
         table.add_row(["Preço Justo", f"R$ {ticker_price_teto:.2f}" if ticker_price_teto is not None else "N/A"])
         table.add_row(
-            ["Preço Teto para dividendo", f"R$ {teto_dividendo:.2f}" if bazin is not None else "N/A"])
+            ["Preço Teto para dividendo", f"R$ {teto_dividendo:.2f}" if teto_dividendo is not None else "N/A"])
         table.add_row(["Preço Atual", f"R$ {get_price(ticker_information):.2f}" if get_price(ticker_information) is not None else "N/A"])
         table.add_row(["Venda", f"R$ {get_bid(ticker_information):.2f}" if get_bid(ticker_information) is not None else "N/A"])
         table.add_row(["Compra", f"R$ {get_ask(ticker_information):.2f}" if get_ask(ticker_information) is not None else "N/A"])

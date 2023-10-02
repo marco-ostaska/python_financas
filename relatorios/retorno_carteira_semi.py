@@ -54,6 +54,18 @@ def retorno_ano(ticker):
         print(f"Dados históricos não disponíveis para {ticker}")
         return None
 
+def calcular_semivariancia(retorno_diario, peso):
+    """Calcula a semivariância da carteira."""
+    # Calcular o retorno diário da carteira
+    retorno_port = np.dot(retorno_diario, peso)
+
+    # Identificar os retornos negativos
+    downside_return = retorno_port[retorno_port < 0]
+
+    # Calcular a semivariância
+    semivariancia = np.mean(downside_return**2)
+
+    return semivariancia
 
 
 
@@ -67,28 +79,31 @@ def calcular_indices(ativos, peso):
 
     retorno = np.dot(peso, retorno_anual)
     volatilidade = np.sqrt(np.dot(peso.T, np.dot(cov_anual, peso)))
+    semivariancia = calcular_semivariancia(retorno_diario, peso)
     sharpe = retorno / volatilidade
 
-    return retorno, volatilidade, sharpe
+    return retorno, volatilidade, semivariancia, sharpe
+
 
 
 def montar_carteira(ativos, peso):
-    retorno, volatilidade, sharpe = calcular_indices(ativos, peso)
+    retorno, volatilidade, semivariancia, sharpe = calcular_indices(ativos, peso)
 
     carteira = {
         'Retorno': [retorno],
         'Volatilidade': [volatilidade],
+        'Semivariância': [semivariancia],
         'Sharpe Ratio': [sharpe]
     }
     for contar, acao in enumerate(ativos.columns.to_list()):
         carteira[acao+' Peso'] = [peso[contar]]
 
     df = pd.DataFrame(carteira)
-    colunas = ['Retorno', 'Volatilidade', 'Sharpe Ratio'] + \
-        [acao+' Peso' for acao in ativos.columns.to_list()]
+    colunas = ['Retorno', 'Volatilidade', 'Semivariância', 'Sharpe Ratio'] + [acao+' Peso' for acao in ativos.columns.to_list()]
     df = df[colunas]
 
     return df
+
 
 def calcular_retorno_carteira_recomendada(df, tickers):
     retornos = []
@@ -112,6 +127,7 @@ def print_portfolio(df, title, tickers):
     table.add_row(["Status", f"{carteira_status}"])
     table.add_row(["Volatilidade (Risco )", f"{df['Volatilidade'].iloc[0]*100:.2f}%"])
     table.add_row(["Sharpe Ratio", f"{df['Sharpe Ratio'].iloc[0]:.2f}"])
+    table.add_row(["Semivariância", f"{df['Semivariância'].iloc[0]*100:.2f}%"])
 
 
     print(table)
