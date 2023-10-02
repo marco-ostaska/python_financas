@@ -103,10 +103,21 @@ def preco_teto_adaptado(ticker_info, taxa_retorno_esperada):
     # Verificar se 'previousClose' está presente no dicionário info
     if 'previousClose' in ticker_info.info and ticker_info.info['previousClose'] is not None:
         preco_fechamento = ticker_info.info['previousClose']
-        margem_seguranca = 0.05
+        margem_seguranca = 0.02
         taxa = ((100 - (100/(SELIC*0.85))) /100) - margem_seguranca
         preco_teto = preco_fechamento * (taxa + taxa_retorno_esperada)
 
+        return preco_teto
+
+    return None
+
+
+def preco_teto_dividendo(ticker_info, taxa_retorno_esperada):
+    # Verificar se 'previousClose' está presente no dicionário info
+    if get_last_dividend(ticker_info) is not None:
+        margem_seguranca = taxa_retorno_esperada * 0.80
+        preco_teto = (get_last_dividend(ticker_info)
+                      * (100/(SELIC)/margem_seguranca))
         return preco_teto
 
     return None
@@ -143,6 +154,7 @@ def output(tickers):
         capm = retorno_esperado_capm(ticker)
         risco = risco_ativo(ticker)
         ticker_price_teto = preco_teto_adaptado(ticker_information, capm)
+        teto_dividendo = preco_teto_dividendo(ticker_information, capm)
         retorno_percentual = retorno_ano(ticker)
         retorno_anual_estimado = estimativa_retorno_anual(ticker)
 
@@ -157,6 +169,8 @@ def output(tickers):
         table.add_row(["Performance", f"BOA" if retorno_anual_estimado >= capm else "RUIM"])
         table.add_row(["Risco (Volatilidade)", f"{risco*100:.2f}%"])
         table.add_row(["Preço Justo", f"R$ {ticker_price_teto:.2f}" if ticker_price_teto is not None else "N/A"])
+        table.add_row(
+            ["Preço Teto para dividendo", f"R$ {teto_dividendo:.2f}" if bazin is not None else "N/A"])
         table.add_row(["Preço Atual", f"R$ {get_price(ticker_information):.2f}" if get_price(ticker_information) is not None else "N/A"])
         table.add_row(["Venda", f"R$ {get_bid(ticker_information):.2f}" if get_bid(ticker_information) is not None else "N/A"])
         table.add_row(["Compra", f"R$ {get_ask(ticker_information):.2f}" if get_ask(ticker_information) is not None else "N/A"])
