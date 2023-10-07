@@ -90,8 +90,10 @@ def print_melhores(retornos):
 
 def print_cabecalho(i, dias_previsoes):
     print("------------------------------------------------------------------")
-    if i == dias_previsoes[-1]:
+    if i == dias_previsoes[-2]:
         print(f"Ativos com melhores projeção até final do ano")
+    elif i == dias_previsoes[-1]:
+        print(f"Ativos com melhores projeção para 5 anos")
     else:
         print(f"melhores projeção para os proximos {i} dias")
     print("------------------------------------------------------------------")
@@ -130,7 +132,7 @@ def opt():
     if selecao == 1:
         return "ibov.txt"
     if selecao == 2:
-        return "idix.txt"
+        return "idiv.txt"
     if selecao == 3:
         return "small.txt"
     if selecao == 4:
@@ -144,7 +146,7 @@ def opt():
 def main():
     ativos = ler_tickers(opt())
     anos_historico = 5
-    dias_previsoes = [7, 30, 90, dias_ate_final_ano()]
+    dias_previsoes = [7, 30, 90, dias_ate_final_ano(), 5*365]
 
     lista_ativos = gerar_lista_ativos(ativos,anos_historico)
 

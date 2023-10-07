@@ -76,8 +76,10 @@ def print_cabecalho(ativo):
     print("-----------------------------------------------------------------------------")
 
 def print_cabecalho_previsoes(i, dias_previsoes):
-    if i == dias_previsoes[-1]:
+    if i == dias_previsoes[-2]:
         print(f"Previsão até final do ano")
+    elif i== dias_previsoes[-1]:
+        print(f"Previsão em cinco anos")
     else:
         print(f"Previsão para os proximos {i} dias")
 
@@ -86,7 +88,7 @@ def print_cabecalho_previsoes(i, dias_previsoes):
 
 # Função para exibir a previsão
 def print_forecast(ativo):
-    dias_previsoes=[7,30,90,dias_ate_final_ano()]
+    dias_previsoes=[7,30,90,dias_ate_final_ano(), 5*365]
     print_cabecalho(ativo)
 
     for dp in dias_previsoes:
