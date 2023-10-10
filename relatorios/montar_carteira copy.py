@@ -93,33 +93,6 @@ def risco_ativo(ticker):
     return volatilidade
 
 
-# Usando as funções para calcular os valores desejados para todos os ativos
-# for ticker in tickers:
-#     capm = retorno_esperado_capm(ticker)
-#     risco = risco_ativo(ticker)
-#     ticker_price_teto = preco_teto_adaptado(ticker, capm)
-#     retorno_percentual = retorno_ano(ticker)
-#     retorno_anual_estimado = estimativa_retorno_anual(ticker)
-
-
-#     table = PrettyTable()
-#     table.title = ticker
-#     table.field_names = ["Descrição", "Valor"]
-#     table.align["Descrição"] = "l"  # Alinhamento à esquerda
-#     table.align["Valor"] = "r"  # Alinhamento à direita
-#     table.add_row(["Retorno Anual Esperado para valer correr o risco ", f"{capm*100:.2f}%"])
-#     table.add_row(["Risco (Volatilidade)", f"{risco*100:.2f}%"])
-#     table.add_row(["Preço Teto", f"R$ {ticker_price_teto:.2f}" if ticker_price_teto is not None else "Não disponível"])
-#     table.add_row(["Retorno no Ano", f"{retorno_percentual:.2f}%" if retorno_percentual is not None else "Não disponível"])
-#     table.add_row(["Retorno Anual Estimado", f"{retorno_anual_estimado:.2f}%" if retorno_anual_estimado is not None else "Não disponível"])
-#     table.add_row(["Performance", f"BOM" if retorno_anual_estimado >= capm else "RUIM"])
-
-#     print(table)
-#     print()  # Linha em branco entre as tabelas
-
-
-
-
 # Baixando os dados carteira
 ativos = yf.download(tickers, start="2018-01-01", progress=False)['Adj Close'].dropna()
 retorno_diario = ativos.pct_change()
@@ -201,33 +174,10 @@ def print_portfolio(df, title):
     for ticker, weight in zip(tickers, weights):
         table.add_row([ticker.replace('.SA', ''), f"{weight:.2f}%"])
 
-    # # fazendo isso pra conseguir ordenar as tabelas, sou meio burro entao depois penso em algo melhor
-    # # Pegando os nomes das colunas
-    # columns = table.field_names
-
-    # # Pegando os valores
-    # values = [list(row) for row in table._rows]
-
-    # # Criando o dataframe
-    # dfaux = pd.DataFrame(values, columns=columns)
-
-    # # Convertendo a coluna Alocação para float
-    # dfaux['Alocação'] = dfaux['Alocação'].str.rstrip('%').astype('float') / 100.0
-    # dfaux = dfaux.sort_values(by="Alocação", ascending=False)
-
-    # # Limpar as linhas do objeto table para inserir os valores atualizados de dfaux
-    # table.clear_rows()
-
-    # # Adicionar os valores de dfaux à tabela
-    # for index, row in dfaux.iterrows():
-    #     table.add_row([row['Ativo'], f"{row['Alocação']*100:.2f}%"])
-
     print(table)
 
     print()
     print()
-
-
 
 print()
 print()
