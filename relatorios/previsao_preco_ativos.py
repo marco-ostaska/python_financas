@@ -13,9 +13,9 @@ def print_cabecalho(ativo):
 
 def print_cabecalho_previsoes(i, dias_previsoes):
     if i == dias_previsoes[-2]:
-        print(f"Previsão até final do ano")
+        print("Previsão até final do ano")
     elif i== dias_previsoes[-1]:
-        print(f"Previsão em cinco anos")
+        print("Previsão em cinco anos")
     else:
         print(f"Previsão para os proximos {i} dias")
 

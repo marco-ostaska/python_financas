@@ -26,9 +26,9 @@ def print_melhores(retornos):
 def print_cabecalho(i, dias_previsoes):
     print("------------------------------------------------------------------")
     if i == dias_previsoes[-2]:
-        print(f"Ativos com melhores projeção até final do ano")
+        print("Ativos com melhores projeção até final do ano")
     elif i == dias_previsoes[-1]:
-        print(f"Ativos com melhores projeção para 5 anos")
+        print("Ativos com melhores projeção para 5 anos")
     else:
         print(f"melhores projeção para os proximos {i} dias")
     print("------------------------------------------------------------------")
@@ -52,6 +52,19 @@ def gerar_lista_ativos(ativos,anos_historico):
     return lista_ativos
 
 
+def get_sel(selecao):
+    if selecao == 1:
+        return "ibov.txt"
+    if selecao == 2:
+        return "idiv.txt"
+    if selecao == 3:
+        return "small.txt"
+    if selecao == 4:
+        return "ifix.txt"
+    if selecao == 6:
+        return "custom.txt"
+
+
 def opt():
     selecao=0
     while selecao<1 or selecao>6:
@@ -64,18 +77,8 @@ def opt():
         print("6 - Custom (preencher o arquivo custom.txt)")
         selecao=int(input("opçao desejada: "))
 
-    if selecao == 1:
-        return "ibov.txt"
-    if selecao == 2:
-        return "idiv.txt"
-    if selecao == 3:
-        return "small.txt"
-    if selecao == 4:
-        return "ifix.txt"
-    if selecao == 6:
-        return "custom.txt"
+    return get_sel(selecao)
 
-    return "tickers_bolsa.txt"
 
 
 def main():
@@ -86,12 +89,12 @@ def main():
     lista_ativos = gerar_lista_ativos(ativos,anos_historico)
 
     for dp in dias_previsoes:
-        retornos = []
         print_cabecalho(dp, dias_previsoes)
 
-        for ativo in lista_ativos:
-            retornos.append((ativo.ticker, calcula_projetado(ativo, dp)))
-
+        retornos = [
+            (ativo.ticker, calcula_projetado(ativo, dp))
+            for ativo in lista_ativos
+        ]
         print_melhores(retornos)
 
 # Iniciando o programa
