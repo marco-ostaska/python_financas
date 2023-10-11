@@ -1,44 +1,69 @@
-XPID11,VGIA11,HSML11,KNCR11,BDIF11,GALG11,PATL11,HSLG11,BCRI11,RZAG11,HSAF11,BTRA11,XPML11,XPCA11,MAXR11,IFRA11,RURA11,BTAL11,VISC11,KNCA11,KNRI11,HGRU11,FGAA11
-6.28,4.06,3.66,3.39,3.22,3.13,3.04,2.88,2.77,2.43,2.34,2.10,1.55,1.45,1.38,1.34,1.21,0.84,0.72,0.26,0.10,0.08,0.06
+Entre os tickers separados por virgula: XPID11,VGIA11,HSML11,KNCR11,BDIF11,GALG11,PATL11,HSLG11,BCRI11,RZAG11,HSAF11,BTRA11,HGBS11,XPML11,XPCA11,MAXR11,IFRA11,RURA11,BTAL11,VISC11,KNCA11,KNRI11,HGRU11,FGAA11
+Entre os pesos separados por virgula: 12.28,8.28,7.27,6.78,6.48,6.26,5.77,5.47,5.40,4.84,4.58,4.27,3.95,3.13,2.82,2.75,2.67,2.42,1.69,1.44,0.52,0.20,0.16,0.12
+[*********************100%%**********************]  24 of 24 completed
+Selic do periodo: 7.5 %
+
+Minha carteira    Valores
+----------------  ---------
+Retorno           16.24%
+Risco             5.30%
+Risco Ajustado    4.40%
+Sharpe Ratio      1.65
+Sortino Ratio     1.99
+XPID11.SA Peso    12.28%
+VGIA11.SA Peso    8.28%
+HSML11.SA Peso    7.27%
+KNCR11.SA Peso    6.78%
+BDIF11.SA Peso    6.48%
+GALG11.SA Peso    6.26%
+PATL11.SA Peso    5.77%
+HSLG11.SA Peso    5.47%
+BCRI11.SA Peso    5.40%
+RZAG11.SA Peso    4.84%
+HSAF11.SA Peso    4.58%
+BTRA11.SA Peso    4.27%
+HGBS11.SA Peso    3.95%
+XPML11.SA Peso    3.13%
+XPCA11.SA Peso    2.82%
+MAXR11.SA Peso    2.75%
+IFRA11.SA Peso    2.67%
+RURA11.SA Peso    2.42%
+BTAL11.SA Peso    1.69%
+VISC11.SA Peso    1.44%
+KNCA11.SA Peso    0.52%
+KNRI11.SA Peso    0.20%
+HGRU11.SA Peso    0.16%
+FGAA11.SA Peso    0.12%
 
 
-+------------------------------------------+
-|    Carteira com melhor risco/retorno     |
-+-----------------------+------------------+
-| Descrição             |            Valor |
-+-----------------------+------------------+
-| Retorno Esperado      |           26.83% |
-| Retorno Atual         |           16.98% |
-| Status                | Sharpe Ratio bom |
-| Volatilidade (Risco ) |            4.39% |
-| Sharpe Ratio          |             6.11 |
-+-----------------------+------------------+
-+-------------------+
-|      Alocaçao     |
-+--------+----------+
-| Ativo  | Alocação |
-+--------+----------+
-| BTAL11 |  0.29%   |
-| BTRA11 |  0.21%   |
-| FGAA11 |  6.20%   |
-| GALG11 |  4.83%   |
-| HGLG11 |  7.21%   |
-| HSLG11 |  0.37%   |
-| HSML11 |  5.96%   |
-| IFRA11 |  2.08%   |
-| KNCA11 |  1.26%   |
-| KNCR11 |  6.24%   |
-| KNHY11 |  7.31%   |
-| MALL11 |  8.03%   |
-| MAXR11 |  1.52%   |
-| PATL11 |  0.17%   |
-| RURA11 |  0.54%   |
-| RZAG11 |  1.81%   |
-| VGIA11 |  2.68%   |
-| VILG11 |  4.86%   |
-| VISC11 |  8.83%   |
-| XPCA11 |  4.55%   |
-| XPIN11 |  8.42%   |
-| XPLG11 |  8.24%   |
-| XPML11 |  8.41%   |
-+--------+----------+
+Maior sortino    Valores
+---------------  ---------
+Retorno          24.47%
+Risco            4.55%
+Risco Ajustado   2.91%
+Sharpe Ratio     3.73
+Sortino Ratio    5.84
+BCRI11.SA Peso   0.58%
+BDIF11.SA Peso   4.28%
+BTAL11.SA Peso   0.79%
+BTRA11.SA Peso   0.15%
+FGAA11.SA Peso   0.97%
+GALG11.SA Peso   8.25%
+HGBS11.SA Peso   7.91%
+HGRU11.SA Peso   0.24%
+HSAF11.SA Peso   1.32%
+HSLG11.SA Peso   0.18%
+HSML11.SA Peso   6.53%
+IFRA11.SA Peso   5.41%
+KNCA11.SA Peso   1.15%
+KNCR11.SA Peso   5.33%
+KNRI11.SA Peso   8.14%
+MAXR11.SA Peso   7.68%
+PATL11.SA Peso   2.31%
+RURA11.SA Peso   5.59%
+RZAG11.SA Peso   1.59%
+VGIA11.SA Peso   7.93%
+VISC11.SA Peso   8.20%
+XPCA11.SA Peso   2.01%
+XPID11.SA Peso   5.90%
+XPML11.SA Peso   7.55%
