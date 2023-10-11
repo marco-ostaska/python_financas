@@ -51,7 +51,8 @@ class Acao(Ativos):
 
     @property
     def graham(self):
-        return round(np.sqrt(22.5 * self.lpa * self.vpa), 2)
+        g = float(22.5 * self.lpa * self.vpa)
+        return round(-abs(g) ** 0.5,2) if g < 0 else round(g ** 0.5,2)
 
     def bazin(self, juros):
         dpa = (self.div_yield/100) * self.cotacao
@@ -104,7 +105,8 @@ def fix_pct(text):
 
 
 def main():
-    acao = Acao("ggbr4")
+
+    acao = Acao("mglu3")
     print("Ticker :", acao.ticker)
     print("Cotacao:", acao.cotacao)
     print("PL     :", acao.pl)
@@ -121,11 +123,8 @@ def main():
     acao = FII("hsml11")
     print("Ticker :", acao.ticker)
     print("Cotacao:", acao.cotacao)
-    # print("PL     :", acao.pl)
     print("PVP    :", acao.pvp)
     print("DY     :", acao.div_yield)
-    # print("LPA    :", acao.lpa)
-    # print("VPA    :", acao.vpa)
     print("Graham :", acao.graham)
     print("Bazin  :", acao.bazin(7))
 

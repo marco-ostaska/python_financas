@@ -1,63 +1,102 @@
-import numpy as np
-import pandas as pd
-import yfinance as yf
-from prettytable import PrettyTable
-from datetime import datetime, timedelta
+from matplotlib.pyplot import tick_params
+import bancoCentral
+import fundamentusData
+from tabulate import tabulate
 
-class BCB:
-    SELIC = {"nome": "SELIC", "codigo": 11}
-    IPCA = {"nome": "IPCA", "codigo": 10844}
+def taxa_livre_risco():
+    selic = bancoCentral.SELIC(5)
+    ipca = bancoCentral.IPCA(5)
 
-    def __init__(self):
-        self.selic_history = self.parse_bcb()
+    if ipca.media_ganho_real() > selic.media_anual():
+        return ipca.media_ganho_real()
 
-    def parse_bcb(codigo_serie, indice):
-        hoje = datetime.now()
-        data_inicio = f"{hoje.day}/{hoje.month}/{hoje.year-ANOS_PASSADOS}"
-
-    def parse_bcb(self):
-        return BCB.SELIC["nome"]
-
-class Indices():
-    TOTAL_DIAS_NEGOCIACAO=252
-    BENCHMARK="^BVSP"
+    return selic.media_anual()
 
 
-    def __init__(self, anos_historico):
-        self.anos_historico = anos_historico
-        self.ipca_media = round(self.parse_bcb(10844).mean().values[0]*12,2)
-        self.selic_media = round(self.parse_bcb(11).mean().values[0]*22*12,2)
+def get_tickers():
+    tickers = input("Entre os tickers separados por virgula: ")
+    return [t.upper().strip() for t in tickers.split(",")]
 
 
-    def parse_bcb(self, codigo):
-        hoje = datetime.now()
-        data_inicio = f"{hoje.day}/{hoje.month}/{hoje.year-self.anos_historico}"
-        data_final = f"{hoje.day}/{hoje.month}/{hoje.year}"
+def get_tipo():
+    tipo=None
+    while tipo not in ["1","2"]:
+        print("--------------------------------------------")
+        print("1 - Ações")
+        print("2 - FII")
+        print("--------------------------------------------")
+        tipo = input("Selecione uma opção:")
 
-        URL = f"https://api.bcb.gov.br/dados/serie/bcdata.sgs.{codigo}/dados?formato=csv&dataInicial={data_inicio}&dataFinal={data_final}"
-        df = pd.read_csv(URL, sep=";")
+    return tipo
 
-        # Convertendo a coluna "data" para o formato datetime
-        # Aqui, ajustei o formato da data para corresponder ao formato fornecido: %d/%m/%Y
-        df.rename(columns={"data": "date"}, inplace=True)
-        df["date"] = pd.to_datetime(df["date"], format='%d/%m/%Y')
-        df.set_index('date', inplace=True)
-        df["valor"] = df["valor"].str.replace(',', '.').astype(float)
-        df.rename(columns={"valor": "indice"}, inplace=True)
-        return df
-    
-    def taxa_livre_risco(self):
-        return self.ipca_media if self.ipca_media >  self.selic_media else  self.selic_media 
+def process_acoes(ticker, free_risk):
+    ativo = fundamentusData.Acao(ticker)
+    df = [
+        ["Cotação",f"R$ {ativo.cotacao}"],
+        ["P/L", f"{ativo.pl}"],
+        ["P/VP", f"{ativo.pvp}"],
+        ["DY", f"{ativo.div_yield}%"],
+        ["Ghaham", f"R$ {ativo.graham}"],
+        ["Bazin", f"R$ {ativo.bazin(free_risk)}"]
+
+        ]
+
+    print()
+    print(tabulate(df, headers=[ativo.ticker, "Valores"], tablefmt='simple'))
+
+    return {
+        'ticker': ativo.ticker,
+        'bazin': ativo.bazin(free_risk)
+    }
+
+
+def process_fii(ticker, free_risk):
+    ativo = fundamentusData.FII(ticker)
+    df = [
+        ["Cotação", f"R$ {ativo.cotacao}"],
+        ["P/VP", f"{ativo.pvp}"],
+        ["DY", f"{ativo.div_yield}%"],
+        ["Ghaham", f"R$ {ativo.graham}"],
+        ["Bazin", f"R$ {ativo.bazin(free_risk)}"]
+
+    ]
+    print()
+    print(tabulate(df, headers=[ativo.ticker, "Valores"], tablefmt='simple'))
+
+    return {
+        'ticker': ativo.ticker,
+        'bazin': ativo.bazin(free_risk)
+    }
+
 
 
 
 def main():
+    tipo=get_tipo()
+    tickers = get_tickers()
+    risk_free = taxa_livre_risco()
 
-    indices=Indices(5)
+    results = []
+    for t in tickers:
+        if tipo == "1":
+            results.append(process_acoes(t, risk_free))
+        else:
+            results.append(process_fii(t, risk_free))
+  # Ordena os resultados pelo desconto Bazin
+    sorted_results = sorted(results, key=lambda x: x['bazin'])
 
-    print(indices.taxa_livre_risco())
+    # Agora imprime os ativos ordenados
+    for result in sorted_results:
+        print(f"Ticker: {result['ticker']} - Bazin: R$ {result['bazin']}")
+
+
+
+
+
+
+
+
 
 
 if __name__ == "__main__":
     main()
-
